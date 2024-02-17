@@ -1,0 +1,25 @@
+#!/bin/bash
+kaivitatav_kasutaja=$(whoami)
+
+if [ "$kaivitatav_kasutaja" = "root" ]; then
+    if [ $# -ne 1 ]; then
+        echo "Kasutajajuhend: $0 kasutajad"
+    else
+        kasutajad=$1
+
+        if [ -f "$kasutajad" -a -r "$kasutajad" ]; then
+            echo "Fail on korras"
+            while IFS=: read -r kasutajanimi; do
+#yl1 fail on kasutaja loomise script
+                sh yl1 "$kasutajanimi"
+                parool=$(pwgen -s 8 -1)
+                echo "$kasutajanimi:$parool" | chpasswd
+                echo "$kasutajanimi - $parool" >> loodud_kasutajad_paroolidega
+            done < "$kasutajad"
+        else
+            echo "Probleem failiga $kasutajad"
+        fi
+    fi
+else
+    echo "Sul ei ole õigust antud skripti käivitamiseks"
+fi
